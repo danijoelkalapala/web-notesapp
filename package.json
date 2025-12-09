@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build": "npm --prefix frontend install --no-audit --no-fund && npm --prefix frontend run build && cp -r frontend/build build",
+    "build": "node ./scripts/build-frontend.js",
+    "postinstall": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
