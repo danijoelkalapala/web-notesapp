@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import NoteList from "../components/NoteList";
 import NoteEditor from "../components/NoteEditor";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 const Notes = () => {
   const navigate = useNavigate();
