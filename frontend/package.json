@@ -5,7 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+<<<<<<< HEAD
     "build": "vite build && node -e \"require('fs').cpSync('dist','build',{recursive:true})\"",
+=======
+  "build": "vite build && node -e \"require('fs').cpSync('dist','build',{recursive:true})\"",
+    "lint": "eslint .",
+>>>>>>> 66c0c4ef173bd405c9e9c75e4e7c8f30e7f74242
     "lint": "eslint .",
     "preview": "vite preview"
   },
