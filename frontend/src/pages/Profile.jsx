@@ -154,6 +154,7 @@ const Profile = () => {
 
             setMessage({ type: 'success', text: 'Password updated successfully' });
             setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            setShowPasswordForm(false);
 
             // Optional: Logout user to force re-login with new password
             // setTimeout(() => {

@@ -57,6 +57,25 @@ exports.updateNote = async (req, res) => {
     const existing = await Note.findById(req.params.id);
     if (!existing) return res.status(404).json({ error: 'Note not found' });
     if (existing.user && existing.user.toString() !== req.userId) return res.status(403).json({ error: 'Forbidden' });
+
+    // Identify removed attachments to delete from Cloudinary
+    const oldAttachments = existing.attachments || [];
+    const newAttachments = attachments || [];
+    // Create a set of kept public_ids for O(1) lookup
+    const keptPublicIds = new Set(newAttachments.map(a => a.public_id).filter(id => id));
+
+    // items present in old but NOT in new are to be deleted
+    const removedAttachments = oldAttachments.filter(a => a.public_id && !keptPublicIds.has(a.public_id));
+
+    for (const att of removedAttachments) {
+      try {
+        await cloudinary.uploader.destroy(att.public_id, { resource_type: att.resource_type || 'auto' });
+        console.log(`Deleted removed attachment from Cloudinary: ${att.public_id}`);
+      } catch (error) {
+        console.error(`Failed to delete removed attachment: ${att.public_id}`, error);
+      }
+    }
+
     existing.title = title;
     existing.content = content;
     existing.imageUrls = imageUrls;
