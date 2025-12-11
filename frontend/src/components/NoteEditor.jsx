@@ -12,8 +12,9 @@ const NoteEditor = ({ note, onSave, onCancel, onDelete }) => {
     if (contentRef.current) {
       const rawContent = note?.content || "";
       const htmlContent = rawContent
-        .replace(MEDIA_TAG_REGEX, (match, type, url) => {
-          return createMediaHtml(type, url, match);
+        .replace(MEDIA_TAG_REGEX, (match, type, content) => {
+          const [url, public_id, resource_type] = content.split('|');
+          return createMediaHtml(type, url, match, { public_id, resource_type });
         })
         .replace(/\n/g, "<br>");
 
@@ -171,7 +172,7 @@ const NoteEditor = ({ note, onSave, onCancel, onDelete }) => {
 
       const data = await res.json();
       if (data.url) {
-        insertMedia(type, data.url);
+        insertMedia(type, data.url, { public_id: data.public_id, resource_type: data.resource_type });
       } else {
         throw new Error("No file URL returned from server");
       }
