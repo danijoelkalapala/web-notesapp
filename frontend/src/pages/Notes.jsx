@@ -18,11 +18,32 @@ const Notes = () => {
     const userId = sessionStorage.getItem("quick-notes-user-id");
     const userName = sessionStorage.getItem("quick-notes-user-name");
     const auth = sessionStorage.getItem("quick-notes-auth");
+
     if (!auth) {
       navigate("/login");
       return;
     }
-    setUser(userName || userId);
+
+    // Set initial user from session, then fetch full profile
+    setUser(userName ? { name: userName } : null);
+
+    const fetchProfile = async () => {
+      try {
+        const token = sessionStorage.getItem("quick-notes-token");
+        const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchProfile();
     fetchNotes();
   }, [navigate]);
 
@@ -124,10 +145,10 @@ const Notes = () => {
         onDelete={
           activeNote?.id
             ? () =>
-                handleDelete(activeNote.id).then(() => {
-                  setView("list");
-                  setActiveNote(null);
-                })
+              handleDelete(activeNote.id).then(() => {
+                setView("list");
+                setActiveNote(null);
+              })
             : null
         }
       />

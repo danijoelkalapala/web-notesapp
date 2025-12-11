@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Login = () => {
   const location = useLocation();
@@ -15,6 +16,7 @@ const Login = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,10 +30,10 @@ const Login = () => {
     const endpoint = isRegister ? "/api/users/register" : "/api/users/login";
     const payload = isRegister
       ? {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        }
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      }
       : { email: formData.email, password: formData.password };
 
     try {
@@ -138,16 +140,25 @@ const Login = () => {
             >
               Password
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              className="block w-full px-4 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300/50 focus:border-gray-500 transition-all duration-200 text-sm shadow-sm"
-            />
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                required
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                className="block w-full px-4 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300/50 focus:border-gray-500 transition-all duration-200 text-sm shadow-sm pr-10"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           <button
@@ -160,8 +171,8 @@ const Login = () => {
                 ? "Registering..."
                 : "Signing In..."
               : isRegister
-              ? "Register"
-              : "Sign In"}
+                ? "Register"
+                : "Sign In"}
           </button>
         </form>
 
@@ -175,11 +186,13 @@ const Login = () => {
           </Link>
         </p>
 
-        {error && (
-          <p className="mt-4 text-center text-red-500 text-sm">{error}</p>
-        )}
-      </div>
-    </div>
+        {
+          error && (
+            <p className="mt-4 text-center text-red-500 text-sm">{error}</p>
+          )
+        }
+      </div >
+    </div >
   );
 };
 

@@ -8,6 +8,7 @@ import {
 import Intro from "./pages/Intro";
 import Login from "./pages/Login";
 import Notes from "./pages/Notes";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Login />} />
         <Route path="/notes" element={<Notes />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

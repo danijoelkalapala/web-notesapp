@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Plus, Search, Trash2, User, LogOut, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const NoteList = ({
   notes,
@@ -12,6 +13,7 @@ const NoteList = ({
   user,
   onLogout,
 }) => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const filteredNotes = notes.filter(
@@ -50,23 +52,27 @@ const NoteList = ({
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
         <div className="flex items-center justify-between w-full sm:w-auto">
           <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-           GAH Notemaker
+            GAH Notemaker
           </h1>
           <div className="ml-auto sm:hidden relative">
             <button
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm overflow-hidden border border-gray-200"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <User size={20} />
+              {user?.profilePic ? (
+                <img src={user.profilePic} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User size={20} />
+              )}
             </button>
             {isMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-30 overflow-hidden py-1">
                 <div className="flex items-center px-4 py-2 text-sm text-gray-700 pointer-events-none border-b border-gray-100 mb-1">
-                  <span className="font-medium truncate">User: {user}</span>
+                  <span className="font-medium truncate">User: {user?.name || "User"}</span>
                 </div>
                 <button
                   className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                  onClick={() => alert("Profile settings feature coming soon!")}
+                  onClick={() => navigate('/profile')}
                 >
                   <Settings size={16} className="mr-2" />
                   <span className="font-medium">Profile Settings</span>
@@ -98,22 +104,25 @@ const NoteList = ({
           </div>
           <div className="hidden sm:block order-1 sm:order-2 relative">
             <button
-              className={`flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm ${
-                isMenuOpen ? "ring-2 ring-gray-400" : ""
-              }`}
+              className={`flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm overflow-hidden border border-gray-200 ${isMenuOpen ? "ring-2 ring-gray-400" : ""
+                }`}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <User size={20} />
+              {user?.profilePic ? (
+                <img src={user.profilePic} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User size={20} />
+              )}
             </button>
 
             {isMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-30 overflow-hidden py-1">
                 <div className="flex items-center px-4 py-2 text-sm text-gray-700 pointer-events-none border-b border-gray-100 mb-1">
-                  <span className="font-medium truncate">User: {user}</span>
+                  <span className="font-medium truncate">User: {user?.name || "User"}</span>
                 </div>
                 <button
                   className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                  onClick={() => alert("Profile settings feature coming soon!")}
+                  onClick={() => navigate('/profile')}
                 >
                   <Settings size={16} className="mr-2" />
                   <span className="font-medium">Profile Settings</span>
@@ -158,9 +167,8 @@ const NoteList = ({
             >
               <div className="flex justify-between items-start mb-2">
                 <h3
-                  className={`font-semibold text-lg text-gray-800 line-clamp-1 ${
-                    !note.title ? "text-gray-400 italic" : ""
-                  }`}
+                  className={`font-semibold text-lg text-gray-800 line-clamp-1 ${!note.title ? "text-gray-400 italic" : ""
+                    }`}
                 >
                   {note.title || "Untitled Note"}
                 </h3>
