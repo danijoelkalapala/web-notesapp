@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { NotebookText } from "lucide-react";
+
 
 const Intro = () => {
   return (
@@ -8,7 +8,7 @@ const Intro = () => {
       <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-2xl transition-all duration-500">
         <div className="text-center py-10">
           <div className="flex justify-center mb-6 text-gray-800">
-            <NotebookText size={48} strokeWidth={2} />
+            <img src="/GAH notemaker.svg" alt="App Logo" className="w-16 h-16" />
           </div>
           <h1 className="text-5xl font-extrabold text-gray-900 tracking-tighter mb-4">
             GAH Notemaker
@@ -34,7 +34,7 @@ const Intro = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

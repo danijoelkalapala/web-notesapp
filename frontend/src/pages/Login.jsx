@@ -133,6 +133,9 @@ const Login = () => {
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-2xl transition-all duration-500">
+        <div className="flex justify-center mb-6">
+          <img src="/GAH notemaker.svg" alt="App Logo" className="w-16 h-16" />
+        </div>
         <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight text-center mb-6">
           {isRegister
             ? "Create New Account"

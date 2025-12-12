@@ -51,9 +51,12 @@ const NoteList = ({
       {/* Header */}
       <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
         <div className="flex items-center justify-between w-full sm:w-auto">
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-            GAH Notemaker
-          </h1>
+          <div className="flex items-center gap-3">
+            <img src="/GAH notemaker.svg" alt="App Logo" className="w-10 h-10" />
+            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+              GAH Notemaker
+            </h1>
+          </div>
           <div className="ml-auto sm:hidden relative">
             <button
               className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm overflow-hidden border border-gray-200"
