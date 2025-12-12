@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, ArrowLeft, Lock, Save, Camera, X, LogOut, FileText, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { User, ArrowLeft, Lock, Save, Camera, X, LogOut, FileText, Eye, EyeOff, Trash2, Edit2, Check } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -13,6 +13,10 @@ const Profile = () => {
     const [uploading, setUploading] = useState(false);
     const [showPasswordForm, setShowPasswordForm] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
+
+    // Add state for editing username
+    const [isEditingUsername, setIsEditingUsername] = useState(false);
+    const [usernameInput, setUsernameInput] = useState('');
 
     const [passwords, setPasswords] = useState({
         currentPassword: '',
@@ -92,6 +96,38 @@ const Profile = () => {
     };
 
     useEffect(() => {
+        if (user?.username) setUsernameInput(user.username);
+    }, [user]);
+
+    const handleUpdateUsername = async () => {
+        if (!usernameInput || usernameInput === user.username) {
+            setIsEditingUsername(false);
+            return;
+        }
+
+        try {
+            const token = sessionStorage.getItem("quick-notes-token");
+            const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ username: usernameInput })
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to update username');
+
+            setUser(data);
+            setIsEditingUsername(false);
+            setMessage({ type: 'success', text: 'Username updated!' });
+        } catch (error) {
+            setMessage({ type: 'error', text: error.message });
+        }
+    };
+
+    useEffect(() => {
         const fetchProfile = async () => {
             try {
                 const token = sessionStorage.getItem("quick-notes-token");
@@ -155,12 +191,6 @@ const Profile = () => {
             setMessage({ type: 'success', text: 'Password updated successfully' });
             setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
             setShowPasswordForm(false);
-
-            // Optional: Logout user to force re-login with new password
-            // setTimeout(() => {
-            //     sessionStorage.clear();
-            //     navigate('/login');
-            // }, 2000);
 
         } catch (error) {
             setMessage({ type: 'error', text: error.message });
@@ -235,7 +265,28 @@ const Profile = () => {
                         )}
 
                         <h1 className="text-2xl font-bold relative z-10">{user?.name}</h1>
-                        <p className="text-gray-300 relative z-10">{user?.email}</p>
+                        <div className="relative z-10 flex items-center justify-center gap-2 mb-1">
+                            {isEditingUsername ? (
+                                <div className="flex items-center bg-white/10 rounded-lg p-1">
+                                    <span className="text-gray-300 font-mono mr-1">@</span>
+                                    <input
+                                        type="text"
+                                        value={usernameInput}
+                                        onChange={(e) => setUsernameInput(e.target.value)}
+                                        className="bg-transparent text-white font-mono text-sm border-none focus:ring-0 w-32 p-0 placeholder-gray-400"
+                                        autoFocus
+                                    />
+                                    <button onClick={handleUpdateUsername} className="text-green-400 hover:text-green-300 mx-1"><Check size={16} /></button>
+                                    <button onClick={() => { setIsEditingUsername(false); setUsernameInput(user.username); }} className="text-red-400 hover:text-red-300"><X size={16} /></button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center group cursor-pointer" onClick={() => setIsEditingUsername(true)}>
+                                    <p className="text-gray-300 font-mono text-sm">@{user?.username}</p>
+                                    <Edit2 size={12} className="ml-2 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </div>
+                            )}
+                        </div>
+                        <p className="text-gray-400 relative z-10 text-xs mt-1">{user?.email}</p>
                     </div>
 
                     <div className="p-6 sm:p-8">

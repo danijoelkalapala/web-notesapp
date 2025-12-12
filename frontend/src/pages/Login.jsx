@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Check, X } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -9,10 +9,22 @@ const Login = () => {
   const navigate = useNavigate();
   const isRegister = location.pathname === "/register";
 
+  // Reset error when switching between login and register
+  React.useEffect(() => {
+    setError("");
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      username: "",
+    });
+  }, [location.pathname]);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    username: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,10 +34,40 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const checkPassword = (password) => {
+    return {
+      length: password.length >= 6,
+      capital: /[A-Z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+  };
+
+  const passwordChecks = checkPassword(formData.password);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    if (isRegister) {
+      const { email, password } = formData;
+
+      // Strict Check before submit
+      const emailRegex = /^[a-z0-9]+@[a-z0-9]+\.[a-z0-9]+$/;
+      if (!emailRegex.test(email)) {
+        setError("Please enter a valid email address.");
+        setLoading(false);
+        return;
+      }
+
+      const pwdStatus = checkPassword(password);
+      if (!Object.values(pwdStatus).every(Boolean)) {
+        setError("Please check password constraints.");
+        setLoading(false);
+        return;
+      }
+    }
 
     const endpoint = isRegister ? "/api/users/register" : "/api/users/login";
     const payload = isRegister
@@ -33,6 +75,7 @@ const Login = () => {
         name: formData.name,
         email: formData.email,
         password: formData.password,
+        username: formData.username,
       }
       : { email: formData.email, password: formData.password };
 
@@ -80,6 +123,13 @@ const Login = () => {
     }
   };
 
+  const ValidationItem = ({ fulfilled, text }) => (
+    <div className={`flex items-center space-x-2 text-xs ${fulfilled ? 'text-green-600' : 'text-gray-400'}`}>
+      {fulfilled ? <Check size={14} /> : <X size={14} />}
+      <span>{text}</span>
+    </div>
+  );
+
   return (
     <div className="bg-gray-50 min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-2xl transition-all duration-500">
@@ -96,38 +146,58 @@ const Login = () => {
 
         <form onSubmit={handleSubmit}>
           {isRegister && (
-            <div className="mb-5">
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                placeholder="Your name"
-                value={formData.name}
-                onChange={handleChange}
-                className="block w-full px-4 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300/50 focus:border-gray-500 transition-all duration-200 text-sm shadow-sm"
-              />
-            </div>
+            <>
+              <div className="mb-5">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  placeholder="Your name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300/50 focus:border-gray-500 transition-all duration-200 text-sm shadow-sm"
+                />
+              </div>
+              <div className="mb-5">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Username
+                </label>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  placeholder="Choose a username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="block w-full px-4 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300/50 focus:border-gray-500 transition-all duration-200 text-sm shadow-sm"
+                />
+              </div>
+            </>
           )}
           <div className="mb-5">
             <label
               htmlFor="email"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Email
+              {isRegister ? "Email" : "Email or Username"}
             </label>
             <input
               id="email"
               name="email"
-              type="email"
+              type="text"
               required
-              placeholder="user@example.com"
+              placeholder={isRegister ? "user@example.com" : "user@example.com or username"}
               value={formData.email}
               onChange={handleChange}
               className="block w-full px-4 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300/50 focus:border-gray-500 transition-all duration-200 text-sm shadow-sm"
@@ -159,6 +229,14 @@ const Login = () => {
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+            {isRegister && formData.password.length > 0 && (
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <ValidationItem fulfilled={passwordChecks.length} text="At least 6 characters" />
+                <ValidationItem fulfilled={passwordChecks.capital} text="At least one capital letter" />
+                <ValidationItem fulfilled={passwordChecks.number} text="At least one number" />
+                <ValidationItem fulfilled={passwordChecks.special} text="At least one special char" />
+              </div>
+            )}
           </div>
 
           <button
